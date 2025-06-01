@@ -15,7 +15,7 @@ class OrderCreate(BaseModel):
 
 router = APIRouter()
 
-@router.post("/orders")
+@router.post("/")
 async def create_order(
     order_data: OrderCreate,
     db: Session = Depends(get_db),
@@ -64,7 +64,7 @@ async def create_order(
     db.commit()
     return {"message": "Order created successfully", "order_id": order.id}
 
-@router.get("/orders", response_model=List[dict])
+@router.get("/", response_model=List[dict])
 async def get_orders(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -90,7 +90,7 @@ async def get_orders(
         for order in orders
     ]
 
-@router.get("/orders/{order_id}")
+@router.get("/{order_id}")
 async def get_order(
     order_id: int,
     db: Session = Depends(get_db),
@@ -121,7 +121,7 @@ async def get_order(
         ]
     }
 
-@router.put("/orders/{order_id}/status")
+@router.put("/{order_id}/status")
 async def update_order_status(
     order_id: int,
     status: str,

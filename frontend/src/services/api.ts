@@ -12,7 +12,7 @@ const api = axios.create({
 
 // Add token to requests if it exists
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,8 +23,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('token');
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            localStorage.removeItem('access_token');
             window.location.href = '/login';
         }
         return Promise.reject(error);
@@ -48,11 +48,18 @@ interface UserResponse {
 
 export const authService = {
     login: async (username: string, password: string): Promise<LoginResponse> => {
-        const response = await api.post<LoginResponse>('/auth/token', {
-            username,
-            password,
-        });
-        return response.data;
+        try {
+            const response = await api.post<LoginResponse>('/auth/token', {
+                username,
+                password,
+            });
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                throw new Error('Invalid username or password');
+            }
+            throw error;
+        }
     },
     register: async (username: string, email: string, password: string): Promise<UserResponse> => {
         const response = await api.post<UserResponse>('/auth/register', {
@@ -63,8 +70,16 @@ export const authService = {
         return response.data;
     },
     getCurrentUser: async (): Promise<UserResponse> => {
-        const response = await api.get<UserResponse>('/auth/me');
-        return response.data;
+        try {
+            const response = await api.get<UserResponse>('/auth/me');
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                localStorage.removeItem('access_token');
+                throw new Error('Session expired. Please login again.');
+            }
+            throw error;
+        }
     },
 };
 
@@ -102,15 +117,36 @@ export const orderService = {
     },
     // Report endpoints
     getOverviewReport: async () => {
-        const response = await api.get('/reports/overview');
-        return response.data;
+        try {
+            const response = await api.get('/reports/overview');
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 403) {
+                throw new Error('You do not have permission to access reports');
+            }
+            throw error;
+        }
     },
     getProductRevenueReport: async () => {
-        const response = await api.get('/reports/product-revenue');
-        return response.data;
+        try {
+            const response = await api.get('/reports/product-revenue');
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 403) {
+                throw new Error('You do not have permission to access reports');
+            }
+            throw error;
+        }
     },
     getDailyRevenueReport: async () => {
-        const response = await api.get('/reports/daily-revenue');
-        return response.data;
+        try {
+            const response = await api.get('/reports/daily-revenue');
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 403) {
+                throw new Error('You do not have permission to access reports');
+            }
+            throw error;
+        }
     },
 }; 

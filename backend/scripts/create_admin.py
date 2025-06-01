@@ -1,4 +1,4 @@
- import sys
+import sys
 import os
 from pathlib import Path
 
@@ -21,8 +21,8 @@ def create_admin_user():
         # Create admin user
         admin_user = User(
             username="admin",
-            email="admin@example.com",
-            hashed_password=get_password_hash("admin123")
+            email="admin@gmail.com",
+            hashed_password=get_password_hash("123123")
         )
         db.add(admin_user)
         db.commit()

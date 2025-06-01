@@ -20,6 +20,7 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    loading: boolean;
     login: (username: string, password: string) => Promise<LoginResponse>;
     logout: () => void;
 }
@@ -30,37 +31,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            checkAuth();
-        }
+        checkAuth();
     }, []);
 
     const checkAuth = async () => {
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                setLoading(false);
+                return;
+            }
             const userData = await authService.getCurrentUser();
             setUser(userData);
             setIsAuthenticated(true);
             setIsAdmin(userData.role === 2);
         } catch (error) {
             console.error('Auth check failed:', error);
-            logout();
+            localStorage.removeItem('access_token');
+            setUser(null);
+            setIsAuthenticated(false);
+            setIsAdmin(false);
+            navigate('/login');
+        } finally {
+            setLoading(false);
         }
     };
 
     const login = async (username: string, password: string): Promise<LoginResponse> => {
-        const response = await authService.login(username, password);
-        localStorage.setItem('token', response.access_token);
-        setIsAuthenticated(true);
-        setIsAdmin(response.role === 2);
-        return response;
+        try {
+            const response = await authService.login(username, password);
+            localStorage.setItem('access_token', response.access_token);
+            const userData = await authService.getCurrentUser();
+            setUser(userData);
+            setIsAuthenticated(true);
+            setIsAdmin(userData.role === 2);
+            return response;
+        } catch (error) {
+            localStorage.removeItem('access_token');
+            setUser(null);
+            setIsAuthenticated(false);
+            setIsAdmin(false);
+            throw error;
+        }
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('access_token');
         setUser(null);
         setIsAuthenticated(false);
         setIsAdmin(false);
@@ -68,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, loading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

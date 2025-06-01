@@ -7,7 +7,7 @@ from ..utils.auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/products", response_model=List[dict])
+@router.get("/", response_model=List[dict])
 async def get_products(
     category_id: int = None,
     db: Session = Depends(get_db),
@@ -30,7 +30,7 @@ async def get_products(
         for product in products
     ]
 
-@router.post("/products")
+@router.post("/")
 async def create_product(
     name: str,
     description: str,
@@ -52,7 +52,7 @@ async def create_product(
     db.refresh(product)
     return {"message": "Product created successfully", "id": product.id}
 
-@router.put("/products/{product_id}")
+@router.put("/{product_id}")
 async def update_product(
     product_id: int,
     name: str,
@@ -75,7 +75,7 @@ async def update_product(
     db.commit()
     return {"message": "Product updated successfully"}
 
-@router.delete("/products/{product_id}")
+@router.delete("/{product_id}")
 async def delete_product(
     product_id: int,
     db: Session = Depends(get_db),

@@ -7,7 +7,7 @@ from ..utils.auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/categories", response_model=List[dict])
+@router.get("/", response_model=List[dict])
 async def get_categories(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -23,7 +23,7 @@ async def get_categories(
         for category in categories
     ]
 
-@router.post("/categories")
+@router.post("/")
 async def create_category(
     name: str,
     description: str,
@@ -41,7 +41,7 @@ async def create_category(
     db.refresh(category)
     return {"message": "Category created successfully", "id": category.id}
 
-@router.put("/categories/{category_id}")
+@router.put("/{category_id}")
 async def update_category(
     category_id: int,
     name: str,
@@ -60,7 +60,7 @@ async def update_category(
     db.commit()
     return {"message": "Category updated successfully"}
 
-@router.delete("/categories/{category_id}")
+@router.delete("/{category_id}")
 async def delete_category(
     category_id: int,
     db: Session = Depends(get_db),

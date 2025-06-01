@@ -5,14 +5,14 @@ from datetime import datetime, timedelta
 from typing import List
 from ..config.database import get_db
 from ..models.models import Order, OrderItem, User
-from ..utils.auth import get_current_user
+from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter()
 
-@router.get("/reports/overview")
+@router.get("/overview")
 async def get_overview_report(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db)
 ):
     today = datetime.now().date()
     
@@ -29,10 +29,10 @@ async def get_overview_report(
         "total_revenue": float(result.total_revenue or 0)
     }
 
-@router.get("/reports/product-revenue")
+@router.get("/product-revenue")
 async def get_product_revenue_report(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db)
 ):
     today = datetime.now().date()
     
@@ -58,10 +58,10 @@ async def get_product_revenue_report(
         for r in results
     ]
 
-@router.get("/reports/daily-revenue")
+@router.get("/daily-revenue")
 async def get_daily_revenue_report(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db)
 ):
     # Get last 7 days
     end_date = datetime.now().date()

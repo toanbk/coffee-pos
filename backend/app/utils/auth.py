@@ -23,7 +23,7 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1051200"))  # 730 days * 24 hours * 60 minutes
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -60,7 +60,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
     return user
 
-def require_admin(current_user):
+async def require_admin(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.ADMIN.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -68,7 +68,7 @@ def require_admin(current_user):
         )
     return current_user
 
-def require_seller(current_user):
+async def require_seller(current_user: User = Depends(get_current_user)):
     if current_user.role not in [UserRole.SELLER.value, UserRole.ADMIN.value]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

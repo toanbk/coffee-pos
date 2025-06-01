@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Paper,
@@ -15,6 +16,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ComposedChart, ResponsiveContainer } from 'recharts';
 import { orderService } from '../services/api';
 import { formatPrice } from '../utils/format';
+import { useAuth } from '../contexts/AuthContext';
 
 interface OverviewData {
     total_orders: number;
@@ -38,10 +40,16 @@ const Report = () => {
     const [dailyRevenues, setDailyRevenues] = useState<DailyRevenue[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { isAdmin } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!isAdmin) {
+            navigate('/order');
+            return;
+        }
         loadReportData();
-    }, []);
+    }, [isAdmin, navigate]);
 
     const loadReportData = async () => {
         try {
@@ -58,11 +66,14 @@ const Report = () => {
 
             // Load daily revenue data
             const dailyData = await orderService.getDailyRevenueReport();
-            console.log('Daily Revenue Data:', dailyData);
             setDailyRevenues(dailyData);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error loading report data:', error);
-            setError('Failed to load report data. Please try again later.');
+            if (error.response?.status === 403) {
+                navigate('/order');
+            } else {
+                setError('Failed to load report data. Please try again later.');
+            }
         } finally {
             setLoading(false);
         }
