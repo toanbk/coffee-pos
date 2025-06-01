@@ -1,0 +1,36 @@
+{
+    "common": {
+        "welcome": "Welcome to Coffee POS",
+        "sale": "Sale",
+        "report": "Report",
+        "logout": "Logout",
+        "home": "Home",
+        "total": "Total",
+        "placeOrder": "Place Order",
+        "placingOrder": "Placing Order...",
+        "currentOrder": "Current Order",
+        "productName": "Product Name",
+        "quantity": "Quantity",
+        "price": "Price",
+        "subtotal": "Subtotal",
+        "remove": "Remove",
+        "add": "Add"
+    },
+    "auth": {
+        "login": "Login",
+        "username": "Username",
+        "password": "Password",
+        "loginError": "Invalid username or password",
+        "loginSuccess": "Login successful"
+    },
+    "report": {
+        "overview": "Overview",
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue",
+        "revenueByProduct": "Revenue by Product",
+        "revenueLast7Days": "Revenue Last 7 Days",
+        "date": "Date",
+        "revenue": "Revenue",
+        "trend": "Trend"
+    }
+} 

@@ -22,6 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { categoryService, productService, orderService } from '../services/api';
 import type { Category, Product, OrderItem } from '../types';
 import Header from '../components/Header';
+import { useTranslation } from 'react-i18next';
 
 const Order: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -31,6 +32,7 @@ const Order: React.FC = () => {
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         loadCategories();
@@ -170,7 +172,7 @@ const Order: React.FC = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header title="Sale" />
+            <Header title={t('common.sale')} />
             <Box sx={{ display: 'flex', height: '100vh', width: '100%' }}>
                 {/* Categories Column - 15% */}
                 <Box sx={{ 
@@ -315,7 +317,7 @@ const Order: React.FC = () => {
                         pb: 10, // Add padding bottom to prevent content from being hidden behind fixed button
                     }}>
                         <Typography variant="h6" gutterBottom>
-                            Current Order
+                            {t('common.currentOrder')}
                         </Typography>
                         <List>
                             {cart.map((item) => (
@@ -450,7 +452,7 @@ const Order: React.FC = () => {
                             justifyContent: 'space-between', 
                             mb: 2 
                         }}>
-                            <Typography variant="h6">Total:</Typography>
+                            <Typography variant="h6">{t('common.total')}:</Typography>
                             <Typography variant="h6" color="primary">
                                 {formatPrice(calculateTotal())}
                             </Typography>
@@ -466,7 +468,7 @@ const Order: React.FC = () => {
                                 fontSize: '1.1rem'
                             }}
                         >
-                            {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
+                            {isPlacingOrder ? t('common.placingOrder') : t('common.placeOrder')}
                         </Button>
                     </Box>
                 </Box>

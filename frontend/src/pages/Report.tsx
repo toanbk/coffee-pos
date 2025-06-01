@@ -19,6 +19,7 @@ import { orderService } from '../services/api';
 import { formatPrice } from '../utils/format';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
+import { useTranslation } from 'react-i18next';
 
 interface OverviewData {
     total_orders: number;
@@ -44,6 +45,7 @@ const Report: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const { isAdmin } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (!isAdmin) {
@@ -99,7 +101,7 @@ const Report: React.FC = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header title="Report" />
+            <Header title={t('common.report')} />
             <Box sx={{ p: 3 }}>
                 {/* Overview Section */}
                 <Grid container spacing={3} sx={{ mb: 4, justifyContent: 'center' }}>
@@ -112,7 +114,7 @@ const Report: React.FC = () => {
                             boxShadow: 'none',
                         }}>
                             <Typography variant="h6" color="textSecondary" gutterBottom>
-                                Total Orders
+                                {t('report.totalOrders')}
                             </Typography>
                             <Typography variant="h4" color="primary">
                                 {overview.total_orders}
@@ -128,7 +130,7 @@ const Report: React.FC = () => {
                             boxShadow: 'none',
                         }}>
                             <Typography variant="h6" color="textSecondary" gutterBottom>
-                                Total Revenue
+                                {t('report.totalRevenue')}
                             </Typography>
                             <Typography variant="h4" color="primary">
                                 {formatPrice(overview.total_revenue)}
@@ -145,15 +147,15 @@ const Report: React.FC = () => {
                     boxShadow: 'none',
                 }}>
                     <Typography variant="h6" sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                        Revenue by Product
+                        {t('report.revenueByProduct')}
                     </Typography>
                     <TableContainer>
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Product Name</TableCell>
-                                    <TableCell align="right">Quantity</TableCell>
-                                    <TableCell align="right">Total Price</TableCell>
+                                    <TableCell>{t('common.productName')}</TableCell>
+                                    <TableCell align="right">{t('common.quantity')}</TableCell>
+                                    <TableCell align="right">{t('common.price')}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -177,7 +179,7 @@ const Report: React.FC = () => {
                     boxShadow: 'none',
                 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                        Revenue Last 7 Days
+                        {t('report.revenueLast7Days')}
                     </Typography>
                     <Box sx={{ width: '100%', height: 400 }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -199,15 +201,15 @@ const Report: React.FC = () => {
                                 />
                                 <Tooltip 
                                     formatter={(value) => formatPrice(value as number)}
-                                    labelFormatter={(label) => `Date: ${label}`}
+                                    labelFormatter={(label) => `${t('report.date')}: ${label}`}
                                 />
                                 <Legend />
-                                <Bar dataKey="revenue" fill="#2EBD85" name="Revenue" />
+                                <Bar dataKey="revenue" fill="#2EBD85" name={t('report.revenue')} />
                                 <Line 
                                     type="monotone" 
                                     dataKey="revenue" 
                                     stroke="#ff7300" 
-                                    name="Trend"
+                                    name={t('report.trend')}
                                     strokeWidth={2}
                                 />
                             </ComposedChart>

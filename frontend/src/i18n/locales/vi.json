@@ -1,0 +1,36 @@
+{
+    "common": {
+        "welcome": "Chào mừng đến với Coffee POS",
+        "sale": "Bán hàng",
+        "report": "Báo cáo",
+        "logout": "Đăng xuất",
+        "home": "Trang chủ",
+        "total": "Tổng cộng",
+        "placeOrder": "Đặt hàng",
+        "placingOrder": "Đang đặt hàng...",
+        "currentOrder": "Đơn hàng hiện tại",
+        "productName": "Tên sản phẩm",
+        "quantity": "Số lượng",
+        "price": "Giá",
+        "subtotal": "Thành tiền",
+        "remove": "Xóa",
+        "add": "Thêm"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "username": "Tên đăng nhập",
+        "password": "Mật khẩu",
+        "loginError": "Tên đăng nhập hoặc mật khẩu không đúng",
+        "loginSuccess": "Đăng nhập thành công"
+    },
+    "report": {
+        "overview": "Tổng quan",
+        "totalOrders": "Tổng số đơn hàng",
+        "totalRevenue": "Tổng doanh thu",
+        "revenueByProduct": "Doanh thu theo sản phẩm",
+        "revenueLast7Days": "Doanh thu 7 ngày gần nhất",
+        "date": "Ngày",
+        "revenue": "Doanh thu",
+        "trend": "Xu hướng"
+    }
+} 

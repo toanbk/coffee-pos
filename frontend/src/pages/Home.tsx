@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useTranslation } from 'react-i18next';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(4),
@@ -46,6 +47,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 const Home: React.FC = () => {
     const navigate = useNavigate();
     const { logout, isAdmin } = useAuth();
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         logout();
@@ -57,7 +59,7 @@ const Home: React.FC = () => {
             <StyledPaper>
                 <Logo src="/logo.png" alt="Coffee POS Logo" />
                 <Typography variant="h4" component="h1" gutterBottom>
-                    Welcome to Coffee POS
+                    {t('common.welcome')}
                 </Typography>
                 <ButtonContainer>
                     <StyledButton
@@ -67,7 +69,7 @@ const Home: React.FC = () => {
                         onClick={() => navigate('/order')}
                         fullWidth
                     >
-                        Sale
+                        {t('common.sale')}
                     </StyledButton>
                     {isAdmin && (
                         <StyledButton
@@ -77,7 +79,7 @@ const Home: React.FC = () => {
                             onClick={() => navigate('/report')}
                             fullWidth
                         >
-                            Report
+                            {t('common.report')}
                         </StyledButton>
                     )}
                     <StyledButton
@@ -87,7 +89,7 @@ const Home: React.FC = () => {
                         onClick={handleLogout}
                         fullWidth
                     >
-                        Logout
+                        {t('common.logout')}
                     </StyledButton>
                 </ButtonContainer>
             </StyledPaper>

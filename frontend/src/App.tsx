@@ -1,53 +1,33 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { theme } from './theme';
 import Login from './pages/Login';
-import Home from './pages/Home';
 import Order from './pages/Order';
 import Report from './pages/Report';
-import './App.css';
+import Home from './pages/Home';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import './i18n'; // Import i18n configuration
 
-const AppRoutes = () => {
+function App() {
     return (
-        <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-                path="/"
-                element={
-                    <ProtectedRoute>
-                        <Home />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/order"
-                element={
-                    <ProtectedRoute>
-                        <Order />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/report"
-                element={
-                    <ProtectedRoute requireAdmin>
-                        <Report />
-                    </ProtectedRoute>
-                }
-            />
-        </Routes>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Router>
+                <AuthProvider>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                        <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
+                        <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </AuthProvider>
+            </Router>
+        </ThemeProvider>
     );
-};
-
-const App: React.FC = () => {
-    return (
-        <Router>
-            <AuthProvider>
-                <AppRoutes />
-            </AuthProvider>
-        </Router>
-    );
-};
+}
 
 export default App;
