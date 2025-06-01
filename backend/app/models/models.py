@@ -24,7 +24,7 @@ class User(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    orders = relationship("Order", back_populates="user")
+    orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_users_is_active', 'is_active'),
@@ -46,7 +46,7 @@ class Category(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    products = relationship("Product", back_populates="category")
+    products = relationship("Product", back_populates="category", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_categories_is_active', 'is_active'),
@@ -67,7 +67,7 @@ class Product(Base):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     category = relationship("Category", back_populates="products")
-    order_items = relationship("OrderItem", back_populates="product")
+    order_items = relationship("OrderItem", back_populates="product", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_products_is_active', 'is_active'),
@@ -86,7 +86,8 @@ class Order(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    items = relationship("OrderItem", back_populates="order")
+    user = relationship("User", back_populates="orders")
+    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_orders_user_id', 'user_id'),
