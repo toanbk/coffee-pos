@@ -14,7 +14,7 @@ import {
     Grid,
     CircularProgress,
 } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ComposedChart, ResponsiveContainer } from 'recharts';
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ComposedChart, ResponsiveContainer } from 'recharts';
 import { orderService } from '../services/api';
 import { formatPrice } from '../utils/format';
 import { useAuth } from '../contexts/AuthContext';
