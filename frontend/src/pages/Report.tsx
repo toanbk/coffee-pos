@@ -11,7 +11,6 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Grid,
     CircularProgress,
 } from '@mui/material';
 import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ComposedChart, ResponsiveContainer } from 'recharts';
@@ -104,14 +103,24 @@ const Report: React.FC = () => {
             <Header title={t('common.report')} />
             <Box sx={{ p: 3 }}>
                 {/* Overview Section */}
-                <Grid container spacing={3} sx={{ mb: 4, justifyContent: 'center' }}>
-                    <Grid item xs={12} sm={6} md={4}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap', 
+                    gap: 3, 
+                    mb: 4, 
+                    justifyContent: 'center' 
+                }}>
+                    <Box sx={{ 
+                        flex: '1 1 300px',
+                        maxWidth: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(33.33% - 16px)' }
+                    }}>
                         <Paper sx={{ 
                             p: 3, 
                             textAlign: 'center',
                             border: '1px solid',
                             borderColor: 'divider',
                             boxShadow: 'none',
+                            height: '100%'
                         }}>
                             <Typography variant="h6" color="textSecondary" gutterBottom>
                                 {t('report.totalOrders')}
@@ -120,14 +129,18 @@ const Report: React.FC = () => {
                                 {overview.total_orders}
                             </Typography>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
+                    </Box>
+                    <Box sx={{ 
+                        flex: '1 1 300px',
+                        maxWidth: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(33.33% - 16px)' }
+                    }}>
                         <Paper sx={{ 
                             p: 3, 
                             textAlign: 'center',
                             border: '1px solid',
                             borderColor: 'divider',
                             boxShadow: 'none',
+                            height: '100%'
                         }}>
                             <Typography variant="h6" color="textSecondary" gutterBottom>
                                 {t('report.totalRevenue')}
@@ -136,8 +149,8 @@ const Report: React.FC = () => {
                                 {formatPrice(overview.total_revenue)}
                             </Typography>
                         </Paper>
-                    </Grid>
-                </Grid>
+                    </Box>
+                </Box>
 
                 {/* Revenue by Product Table */}
                 <Paper sx={{ 

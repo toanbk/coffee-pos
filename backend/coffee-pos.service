@@ -1,0 +1,15 @@
+[Unit]
+Description=Coffee POS Backend Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/develop/coffee-pos/backend
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+ExecStart=/usr/bin/python3 -m gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target 
