@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import auth, categories, products, orders, system_config
-from .config.database import engine, Base
+from .api import auth, categories, products, orders, reports
+from .models.models import Base
+from .config.database import engine
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(title="Coffee POS API")
 
 # Configure CORS
 app.add_middleware(
