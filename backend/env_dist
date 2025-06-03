@@ -1,3 +1,6 @@
 DATABASE_URL=mysql+pymysql://root:123123@localhost/coffee_pos
 SECRET_KEY=9ba28f16a7d7bc2987c31f51380d606efca4fb40d3ee1ad8d18a7abd18f90b02
 ACCESS_TOKEN_EXPIRE_MINUTES=1051200
+
+# API Configuration
+API_BASE_URL=http://localhost:8000

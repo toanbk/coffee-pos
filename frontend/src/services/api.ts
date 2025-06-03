@@ -1,10 +1,8 @@
 import axios from 'axios';
 import type { Category, Product, Order, OrderItem } from '../types';
 
-const API_URL = 'http://localhost:8000/api';
-
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
     headers: {
         'Content-Type': 'application/json',
     },
