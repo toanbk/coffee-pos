@@ -7,7 +7,10 @@ from .config.database import engine
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Coffee POS API")
+app = FastAPI(
+    title="Coffee POS API",
+    redirect_slashes=False  # Disable automatic trailing slash redirects
+)
 
 # Configure CORS
 app.add_middleware(
