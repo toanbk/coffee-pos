@@ -112,6 +112,11 @@ async def get_monthly_revenue_report(
     first_day_last_month = (first_day_this_month - timedelta(days=1)).replace(day=1)
     # Get the first day of the month before last
     first_day_2_months_ago = (first_day_last_month - timedelta(days=1)).replace(day=1)
+    # Get the first day of the next month
+    if first_day_this_month.month == 12:
+        first_day_next_month = first_day_this_month.replace(year=first_day_this_month.year + 1, month=1, day=1)
+    else:
+        first_day_next_month = first_day_this_month.replace(month=first_day_this_month.month + 1, day=1)
 
     # For query, get all orders from first_day_2_months_ago to today
     results = db.query(
@@ -129,15 +134,8 @@ async def get_monthly_revenue_report(
         func.extract('month', Order.created_at)
     ).all()
 
-    # Build a list for the last 3 months (including current month up to today)
-    months = []
-    for i in range(2, -1, -1):
-        month_date = (first_day_this_month - timedelta(days=1)).replace(day=1) if i == 2 else \
-                     (first_day_this_month - timedelta(days=1)).replace(day=1) if i == 1 else first_day_this_month
-        month_date = (first_day_this_month - timedelta(days=1)).replace(day=1) if i == 2 else \
-                     (first_day_last_month) if i == 1 else first_day_this_month
-        months.append(month_date)
-    months = [first_day_2_months_ago, first_day_last_month, first_day_this_month]
+    # Build a list for the last 3 months, current month, and next month
+    months = [first_day_2_months_ago, first_day_last_month, first_day_this_month, first_day_next_month]
 
     monthly_data = []
     for month_date in months:
@@ -145,6 +143,9 @@ async def get_monthly_revenue_report(
         month = month_date.month
         # Find revenue for this month
         revenue = next((float(r.revenue) for r in results if int(r.year) == year and int(r.month) == month), 0)
+        # For next month (future), always 0
+        if month_date == first_day_next_month:
+            revenue = 0
         monthly_data.append({
             "month": f"{month:02d}/{year}",
             "revenue": revenue
