@@ -1,3 +1,4 @@
-export const formatPrice = (price: number): string => {
-    return `${price.toLocaleString('vi-VN')}đ`;
+export const formatPrice = (price: number | string): string => {
+    const num = typeof price === 'number' ? price : Number(price);
+    return `${num.toLocaleString('vi-VN')}đ`;
 }; 
