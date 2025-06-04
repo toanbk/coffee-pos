@@ -36,10 +36,16 @@ interface DailyRevenue {
     revenue: number;
 }
 
+interface MonthlyRevenue {
+    month: string;
+    revenue: number;
+}
+
 const Report: React.FC = () => {
     const [overview, setOverview] = useState<OverviewData>({ total_orders: 0, total_revenue: 0 });
     const [productRevenues, setProductRevenues] = useState<ProductRevenue[]>([]);
     const [dailyRevenues, setDailyRevenues] = useState<DailyRevenue[]>([]);
+    const [monthlyRevenues, setMonthlyRevenues] = useState<MonthlyRevenue[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { isAdmin } = useAuth();
@@ -70,6 +76,10 @@ const Report: React.FC = () => {
             // Load daily revenue data
             const dailyData = await orderService.getDailyRevenueReport();
             setDailyRevenues(dailyData);
+
+            // Load monthly revenue data
+            const monthlyData = await orderService.getMonthlyRevenueReport();
+            setMonthlyRevenues(monthlyData);
         } catch (error: any) {
             console.error('Error loading report data:', error);
             if (error.response?.status === 403) {
@@ -190,6 +200,7 @@ const Report: React.FC = () => {
                     border: '1px solid',
                     borderColor: 'divider',
                     boxShadow: 'none',
+                    mb: 4
                 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
                         {t('report.revenueLast7Days')}
@@ -218,6 +229,52 @@ const Report: React.FC = () => {
                                 />
                                 <Legend />
                                 <Bar dataKey="revenue" fill="#2EBD85" name={t('report.revenue')} />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="revenue" 
+                                    stroke="#ff7300" 
+                                    name={t('report.trend')}
+                                    strokeWidth={2}
+                                />
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    </Box>
+                </Paper>
+
+                {/* Monthly Revenue Chart (last 3 months) */}
+                <Paper sx={{ 
+                    p: 2,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    boxShadow: 'none',
+                }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        {t('report.revenueLast3Months')}
+                    </Typography>
+                    <Box sx={{ width: '100%', height: 400 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart
+                                data={monthlyRevenues}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis 
+                                    dataKey="month" 
+                                    angle={-15}
+                                    textAnchor="end"
+                                    height={50}
+                                    tick={{ fontSize: 14 }}
+                                />
+                                <YAxis 
+                                    tickFormatter={(value) => formatPrice(value)}
+                                    tick={{ fontSize: 12 }}
+                                />
+                                <Tooltip 
+                                    formatter={(value) => formatPrice(value as number)}
+                                    labelFormatter={(label) => `${t('report.month')}: ${label}`}
+                                />
+                                <Legend />
+                                <Bar dataKey="revenue" fill="#1976d2" name={t('report.revenue')} />
                                 <Line 
                                     type="monotone" 
                                     dataKey="revenue" 

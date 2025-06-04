@@ -147,4 +147,15 @@ export const orderService = {
             throw error;
         }
     },
+    getMonthlyRevenueReport: async () => {
+        try {
+            const response = await api.get('/reports/monthly-revenue');
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 403) {
+                throw new Error('You do not have permission to access reports');
+            }
+            throw error;
+        }
+    },
 }; 

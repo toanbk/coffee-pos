@@ -29,7 +29,9 @@
         "totalRevenue": "Total Revenue",
         "revenueByProduct": "Revenue by Product",
         "revenueLast7Days": "Revenue Last 7 Days",
+        "revenueLast3Months": "Revenue Last 3 Months",
         "date": "Date",
+        "month": "Month",
         "revenue": "Revenue",
         "trend": "Trend"
     }

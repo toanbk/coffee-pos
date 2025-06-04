@@ -99,3 +99,55 @@ async def get_daily_revenue_report(
         current_date += timedelta(days=1)
     
     return daily_data 
+
+@router.get("/monthly-revenue")
+async def get_monthly_revenue_report(
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    today = datetime.now().date()
+    # Get the first day of the current month
+    first_day_this_month = today.replace(day=1)
+    # Get the first day of the previous month
+    first_day_last_month = (first_day_this_month - timedelta(days=1)).replace(day=1)
+    # Get the first day of the month before last
+    first_day_2_months_ago = (first_day_last_month - timedelta(days=1)).replace(day=1)
+
+    # For query, get all orders from first_day_2_months_ago to today
+    results = db.query(
+        func.extract('year', Order.created_at).label('year'),
+        func.extract('month', Order.created_at).label('month'),
+        func.sum(Order.total_amount).label('revenue')
+    ).filter(
+        cast(Order.created_at, Date) >= first_day_2_months_ago,
+        cast(Order.created_at, Date) <= today
+    ).group_by(
+        func.extract('year', Order.created_at),
+        func.extract('month', Order.created_at)
+    ).order_by(
+        func.extract('year', Order.created_at),
+        func.extract('month', Order.created_at)
+    ).all()
+
+    # Build a list for the last 3 months (including current month up to today)
+    months = []
+    for i in range(2, -1, -1):
+        month_date = (first_day_this_month - timedelta(days=1)).replace(day=1) if i == 2 else \
+                     (first_day_this_month - timedelta(days=1)).replace(day=1) if i == 1 else first_day_this_month
+        month_date = (first_day_this_month - timedelta(days=1)).replace(day=1) if i == 2 else \
+                     (first_day_last_month) if i == 1 else first_day_this_month
+        months.append(month_date)
+    months = [first_day_2_months_ago, first_day_last_month, first_day_this_month]
+
+    monthly_data = []
+    for month_date in months:
+        year = month_date.year
+        month = month_date.month
+        # Find revenue for this month
+        revenue = next((float(r.revenue) for r in results if int(r.year) == year and int(r.month) == month), 0)
+        monthly_data.append({
+            "month": f"{month:02d}/{year}",
+            "revenue": revenue
+        })
+
+    return monthly_data 
