@@ -22,6 +22,7 @@ import { categoryService, productService, orderService } from '../services/api';
 import type { Category, Product, OrderItem } from '../types';
 import Header from '../components/Header';
 import { useTranslation } from 'react-i18next';
+import { formatPrice } from '../utils/format';
 
 const Order: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -125,10 +126,6 @@ const Order: React.FC = () => {
                 )
             );
         }
-    };
-
-    const formatPrice = (price: number) => {
-        return `${price.toLocaleString('vi-VN')}đ`;
     };
 
     const calculateSubtotal = (item: OrderItem) => {
