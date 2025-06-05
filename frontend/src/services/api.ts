@@ -165,7 +165,7 @@ export const orderService = {
         return response.data;
     },
     deleteOrder: async (orderId: number) => {
-        const response = await api.delete(`/orders/${orderId}`);
+        const response = await api.delete(`/orders/delete/${orderId}`);
         return response.data;
     },
-}; 
+};

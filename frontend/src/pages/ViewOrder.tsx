@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../services/api';
 import { formatPrice } from '../utils/format';
 import Header from '../components/Header';
-import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Button } from '@mui/material';
+import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,9 @@ const ViewOrder: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -92,6 +95,52 @@ const ViewOrder: React.FC = () => {
                     <Button variant="contained" color="primary" sx={{ mt: 3 }} onClick={() => navigate(-1)}>
                         {t('Back')}
                     </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        sx={{ mt: 3, ml: 2 }}
+                        onClick={() => setDeleteDialogOpen(true)}
+                    >
+                        {t('Delete')}
+                    </Button>
+                    <Dialog
+                        open={deleteDialogOpen}
+                        onClose={() => setDeleteDialogOpen(false)}
+                    >
+                        <DialogTitle>{t('Delete Order')}</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                {t('Are you sure you want to delete this order?')}
+                            </DialogContentText>
+                            {deleteError && (
+                                <Typography color="error" sx={{ mt: 1 }}>{deleteError}</Typography>
+                            )}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+                                {t('Cancel')}
+                            </Button>
+                            <Button
+                                onClick={async () => {
+                                    setDeleting(true);
+                                    setDeleteError(null);
+                                    try {
+                                        await orderService.deleteOrder(order.id);
+                                        setDeleteDialogOpen(false);
+                                        navigate('/order/history');
+                                    } catch (err) {
+                                        setDeleting(false);
+                                        setDeleteError(t('Failed to delete order'));
+                                    }
+                                }}
+                                color="error"
+                                variant="contained"
+                                disabled={deleting}
+                            >
+                                {t('Delete')}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </Paper>
             </Box>
         </Box>

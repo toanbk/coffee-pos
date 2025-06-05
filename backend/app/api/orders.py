@@ -66,7 +66,7 @@ async def create_order(
     db.commit()
     return {"message": "Order created successfully", "order_id": order.id}
 
-@router.get("/", response_model=List[dict])
+@router.get("", response_model=List[dict])
 async def get_orders(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -183,4 +183,13 @@ def get_order_history(
             "total_quantity": total_quantity,
             "total_amount": float(order.total_amount),
         })
-    return result 
+    return result
+
+@router.delete("/delete/{order_id}")
+def delete_order(order_id: int, db: Session = Depends(get_db)):
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    db.delete(order)
+    db.commit()
+    return {"message": "Order deleted successfully"} 
