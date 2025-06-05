@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import LogoutIcon from '@mui/icons-material/Logout';
+import HistoryIcon from '@mui/icons-material/History';
 import { useTranslation } from 'react-i18next';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -70,6 +71,15 @@ const Home: React.FC = () => {
                         fullWidth
                     >
                         {t('common.sale')}
+                    </StyledButton>
+                    <StyledButton
+                        variant="contained"
+                        color="info"
+                        startIcon={<HistoryIcon />}
+                        onClick={() => navigate('/order/history')}
+                        fullWidth
+                    >
+                        {t('Order History')}
                     </StyledButton>
                     {isAdmin && (
                         <StyledButton

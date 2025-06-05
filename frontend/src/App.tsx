@@ -10,6 +10,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './i18n'; // Import i18n configuration
 import OrderHistory from './pages/OrderHistory';
+import ViewOrder from './pages/ViewOrder';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                         <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
                         <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
                         <Route path="/order/history" element={<OrderHistory />} />
+                        <Route path="/order/view/:orderId" element={<ViewOrder />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </AuthProvider>
