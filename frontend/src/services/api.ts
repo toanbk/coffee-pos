@@ -106,7 +106,7 @@ export const orderService = {
         return response.data;
     },
     getOrder: async (orderId: number): Promise<Order> => {
-        const response = await api.get<Order>(`/orders/${orderId}`);
+        const response = await api.get<Order>(`/orders/view/${orderId}`);
         return response.data;
     },
     updateOrderStatus: async (orderId: number, status: string) => {
@@ -157,5 +157,15 @@ export const orderService = {
             }
             throw error;
         }
+    },
+    getOrderHistory: async (dateFilter: string) => {
+        const response = await api.get('/orders/history', {
+            params: { date_filter: dateFilter }
+        });
+        return response.data;
+    },
+    deleteOrder: async (orderId: number) => {
+        const response = await api.delete(`/orders/${orderId}`);
+        return response.data;
     },
 }; 

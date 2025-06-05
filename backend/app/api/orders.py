@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 from ..config.database import get_db
 from ..models.models import Order, OrderItem, Product, User
 from ..utils.auth import get_current_user
 from pydantic import BaseModel
+from datetime import datetime, timedelta
+from ..schemas.order import OrderResponse
 
 class OrderItemCreate(BaseModel):
     product_id: int
@@ -15,7 +17,7 @@ class OrderCreate(BaseModel):
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("")
 async def create_order(
     order_data: OrderCreate,
     db: Session = Depends(get_db),
@@ -90,7 +92,7 @@ async def get_orders(
         for order in orders
     ]
 
-@router.get("/{order_id}")
+@router.get("/view/{order_id}")
 async def get_order(
     order_id: int,
     db: Session = Depends(get_db),
@@ -141,4 +143,44 @@ async def update_order_status(
     
     order.status = status
     db.commit()
-    return {"message": "Order status updated successfully"} 
+    return {"message": "Order status updated successfully"}
+
+@router.get("/history", response_model=List[OrderResponse])
+def get_order_history(
+    date_filter: str = Query(..., description="Filter orders by date range"),
+    db: Session = Depends(get_db)
+):
+    today = datetime.now().date()
+    if date_filter == "today":
+        start_date = today
+        end_date = today + timedelta(days=1)
+    elif date_filter == "yesterday":
+        start_date = today - timedelta(days=1)
+        end_date = today
+    elif date_filter == "7days":
+        start_date = today - timedelta(days=7)
+        end_date = today + timedelta(days=1)
+    elif date_filter == "14days":
+        start_date = today - timedelta(days=14)
+        end_date = today + timedelta(days=1)
+    elif date_filter == "30days":
+        start_date = today - timedelta(days=30)
+        end_date = today + timedelta(days=1)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid date filter")
+
+    orders = db.query(Order).filter(
+        Order.created_at >= start_date,
+        Order.created_at < end_date
+    ).order_by(Order.created_at.desc()).all()
+
+    result = []
+    for order in orders:
+        total_quantity = sum(item.quantity for item in order.items)
+        result.append({
+            "id": order.id,
+            "order_date": order.created_at,
+            "total_quantity": total_quantity,
+            "total_amount": float(order.total_amount),
+        })
+    return result 

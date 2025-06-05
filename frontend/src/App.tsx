@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './i18n'; // Import i18n configuration
+import OrderHistory from './pages/OrderHistory';
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                         <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
                         <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+                        <Route path="/order/history" element={<OrderHistory />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </AuthProvider>

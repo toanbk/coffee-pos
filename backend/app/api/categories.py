@@ -7,7 +7,7 @@ from ..utils.auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/", response_model=List[dict])
+@router.get("", response_model=List[dict])
 async def get_categories(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

@@ -8,8 +8,7 @@ from .config.database import engine
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Coffee POS API",
-    redirect_slashes=False  # Disable automatic trailing slash redirects
+    title="Coffee POS API"
 )
 
 # Configure CORS
