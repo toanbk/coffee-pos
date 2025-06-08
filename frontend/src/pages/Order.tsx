@@ -14,6 +14,8 @@ import {
     TextField,
     Snackbar,
     Alert,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -33,6 +35,8 @@ const Order: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const { t } = useTranslation();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         loadCategories();
@@ -169,22 +173,38 @@ const Order: React.FC = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Header title={t('common.sale')} />
-            <Box sx={{ display: 'flex', height: '100vh', width: '100%' }}>
-                {/* Categories Column - 15% */}
+            <Box sx={{ 
+                display: 'flex', 
+                height: '100vh', 
+                width: '100%',
+                flexDirection: isMobile ? 'column' : 'row'
+            }}>
+                {/* Categories Column */}
                 <Box sx={{ 
-                    width: '15%', 
-                    borderRight: 1, 
+                    width: isMobile ? '100%' : '15%', 
+                    borderRight: isMobile ? 0 : 1,
+                    borderBottom: isMobile ? 1 : 0,
                     borderColor: 'divider',
                     overflow: 'auto',
                     p: 1,
-                    flexShrink: 0
+                    flexShrink: 0,
+                    maxHeight: isMobile ? '200px' : 'none'
                 }}>
-                    <List>
+                    <List sx={{ 
+                        display: 'flex', 
+                        flexDirection: isMobile ? 'row' : 'column',
+                        overflowX: isMobile ? 'auto' : 'visible',
+                        pb: isMobile ? 1 : 0
+                    }}>
                         {categories.map((category) => (
                             <ListItem 
                                 key={category.id} 
                                 disablePadding 
-                                sx={{ mb: 2 }}
+                                sx={{ 
+                                    mb: isMobile ? 0 : 2,
+                                    mr: isMobile ? 2 : 0,
+                                    minWidth: isMobile ? 'auto' : '100%'
+                                }}
                             >
                                 <Paper
                                     sx={{
@@ -197,20 +217,22 @@ const Order: React.FC = () => {
                                         border: '1px solid',
                                         borderColor: 'divider',
                                         boxShadow: 'none',
+                                        whiteSpace: 'nowrap',
+                                        px: 2,
+                                        py: 1
                                     }}
                                     onClick={() => setSelectedCategory(category.id)}
                                 >
                                     <Box sx={{ 
                                         display: 'flex', 
                                         alignItems: 'center', 
-                                        p: 1,
                                         gap: 1
                                     }}>
                                         <CardMedia
                                             component="img"
                                             sx={{ 
-                                                width: 40, 
-                                                height: 40, 
+                                                width: isMobile ? 24 : 40, 
+                                                height: isMobile ? 24 : 40, 
                                                 objectFit: 'cover',
                                                 borderRadius: 1,
                                                 flexShrink: 0
@@ -219,14 +241,13 @@ const Order: React.FC = () => {
                                             alt={category.name}
                                         />
                                         <Typography 
-                                            variant="subtitle2" 
-                                            noWrap 
-                                            sx={{ 
-                                                flex: 1,
+                                            noWrap
+                                            sx={{
                                                 textAlign: 'left',
                                                 textTransform: 'uppercase',
                                                 fontWeight: 500,
-                                                color: selectedCategory === category.id ? 'white' : 'inherit'
+                                                color: selectedCategory === category.id ? 'white' : 'inherit',
+                                                fontSize: isMobile ? '0.8rem' : '0.875rem'
                                             }}
                                         >
                                             {category.name}
@@ -238,18 +259,19 @@ const Order: React.FC = () => {
                     </List>
                 </Box>
 
-                {/* Products Column - 45% */}
+                {/* Products Column */}
                 <Box sx={{ 
-                    width: '45%', 
+                    width: isMobile ? '100%' : '45%', 
                     overflow: 'auto', 
-                    p: 2,
+                    p: isMobile ? 1 : 2,
                     bgcolor: 'background.default',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    flex: 1
                 }}>
                     <Box sx={{ 
                         display: 'grid', 
-                        gridTemplateColumns: 'repeat(2, 1fr)', 
-                        gap: 2 
+                        gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : 'repeat(2, 1fr)', 
+                        gap: isMobile ? 1 : 2 
                     }}>
                         {products.map((product) => (
                             <Card 
@@ -260,7 +282,7 @@ const Order: React.FC = () => {
                                         bgcolor: 'action.hover',
                                     },
                                     transition: 'background-color 0.2s',
-                                    p: '5px',
+                                    p: isMobile ? '2px' : '5px',
                                     border: '1px solid',
                                     borderColor: 'divider',
                                     boxShadow: 'none',
@@ -271,20 +293,36 @@ const Order: React.FC = () => {
                                     <CardMedia
                                         component="img"
                                         sx={{ 
-                                            width: 120,
+                                            width: isMobile ? 80 : 120,
                                             objectFit: 'cover'
                                         }}
                                         image={product.image_url || '/placeholder-product.png'}
                                         alt={product.name}
                                     />
-                                    <CardContent sx={{ flex: 1, p: 1.5 }}>
-                                        <Typography variant="h6" noWrap>
+                                    <CardContent sx={{ 
+                                        flex: 1, 
+                                        p: isMobile ? 1 : 1.5,
+                                        '&:last-child': {
+                                            pb: isMobile ? 1 : 1.5
+                                        }
+                                    }}>
+                                        <Typography 
+                                            variant="h6" 
+                                            noWrap
+                                            sx={{
+                                                fontSize: isMobile ? '0.9rem' : '1.25rem',
+                                                mb: isMobile ? 0.5 : 1
+                                            }}
+                                        >
                                             {product.name}
                                         </Typography>
                                         <Typography 
                                             variant="h6" 
                                             color="primary"
-                                            sx={{ mt: 1 }}
+                                            sx={{ 
+                                                mt: isMobile ? 0 : 1,
+                                                fontSize: isMobile ? '0.9rem' : '1.25rem'
+                                            }}
                                         >
                                             {formatPrice(product.price)}
                                         </Typography>
@@ -295,22 +333,29 @@ const Order: React.FC = () => {
                     </Box>
                 </Box>
 
-                {/* Cart Column - 40% */}
+                {/* Cart Column */}
                 <Box sx={{ 
-                    width: '40%', 
-                    borderLeft: 1, 
+                    width: isMobile ? '100%' : '40%', 
+                    borderLeft: isMobile ? 0 : 1, 
                     borderColor: 'divider',
                     display: 'flex',
                     flexDirection: 'column',
                     flexShrink: 0,
-                    position: 'relative',
-                    height: 'calc(100vh - 64px)', // Subtract header height
+                    position: isMobile ? 'fixed' : 'relative',
+                    bottom: isMobile ? 0 : 'auto',
+                    left: isMobile ? 0 : 'auto',
+                    right: isMobile ? 0 : 'auto',
+                    bgcolor: 'background.paper',
+                    zIndex: isMobile ? 1000 : 'auto',
+                    height: isMobile ? 'auto' : 'calc(100vh - 64px)',
+                    maxHeight: isMobile ? '60vh' : 'none',
+                    borderTop: isMobile ? 1 : 0,
                 }}>
                     <Box sx={{ 
                         p: 2, 
                         flex: 1,
                         overflow: 'auto',
-                        pb: 10, // Add padding bottom to prevent content from being hidden behind fixed button
+                        pb: isMobile ? '140px' : 10,
                     }}>
                         <Typography variant="h6" gutterBottom>
                             {t('common.currentOrder')}
@@ -326,7 +371,7 @@ const Order: React.FC = () => {
                                         '&:hover': {
                                             bgcolor: 'action.hover',
                                         },
-                                        p: 2,
+                                        p: isMobile ? 1 : 2,
                                         border: '1px solid',
                                         borderColor: 'divider',
                                     }}
@@ -335,27 +380,30 @@ const Order: React.FC = () => {
                                         width: '100%',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 2
+                                        gap: 2,
+                                        flexDirection: isMobile ? 'row' : 'row'
                                     }}>
                                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                                            <Typography variant="h6" noWrap sx={{ mb: 0.5 }}>
+                                            <Typography variant="h6" noWrap sx={{ mb: 0.5, fontSize: isMobile ? '1rem' : '1.25rem' }}>
                                                 {item.product_name}
                                             </Typography>
-                                            <Typography variant="subtitle1" color="textSecondary" noWrap>
-                                                {formatPrice(item.unit_price)}
-                                            </Typography>
+                                            {!isMobile && (
+                                                <Typography variant="subtitle1" color="textSecondary" noWrap>
+                                                    {formatPrice(item.unit_price)}
+                                                </Typography>
+                                            )}
                                         </Box>
                                         <Box sx={{ 
                                             display: 'flex', 
                                             alignItems: 'center',
                                             bgcolor: 'background.default',
                                             borderRadius: 1,
-                                            p: 1,
-                                            minWidth: 180,
+                                            p: isMobile ? 0.5 : 1,
+                                            minWidth: isMobile ? 120 : 180,
                                             justifyContent: 'center'
                                         }}>
                                             <IconButton
-                                                size="large"
+                                                size={isMobile ? "small" : "large"}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     updateQuantity(item.product_id, -1);
@@ -366,7 +414,7 @@ const Order: React.FC = () => {
                                                     },
                                                 }}
                                             >
-                                                <RemoveIcon />
+                                                <RemoveIcon fontSize={isMobile ? "small" : "medium"} />
                                             </IconButton>
                                             <TextField
                                                 type="number"
@@ -376,9 +424,9 @@ const Order: React.FC = () => {
                                                     min: 0,
                                                     style: { 
                                                         textAlign: 'center',
-                                                        padding: '8px',
-                                                        width: '80px',
-                                                        fontSize: '1.1rem'
+                                                        padding: isMobile ? '4px' : '8px',
+                                                        width: isMobile ? '40px' : '80px',
+                                                        fontSize: isMobile ? '0.9rem' : '1.1rem'
                                                     }
                                                 }}
                                                 sx={{
@@ -396,7 +444,7 @@ const Order: React.FC = () => {
                                                 }}
                                             />
                                             <IconButton
-                                                size="large"
+                                                size={isMobile ? "small" : "large"}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     updateQuantity(item.product_id, 1);
@@ -407,30 +455,38 @@ const Order: React.FC = () => {
                                                     },
                                                 }}
                                             >
-                                                <AddIcon />
+                                                <AddIcon fontSize={isMobile ? "small" : "medium"} />
                                             </IconButton>
                                         </Box>
-                                        <Typography 
-                                            variant="h6"
-                                            sx={{ 
-                                                fontWeight: 'bold',
-                                                minWidth: 120,
-                                                textAlign: 'right'
-                                            }}
-                                        >
-                                            {formatPrice(calculateSubtotal(item))}
-                                        </Typography>
-                                        <IconButton
-                                            size="large"
-                                            onClick={() => removeFromCart(item.product_id)}
-                                            sx={{ 
-                                                '&:hover': {
-                                                    color: 'error.main',
-                                                },
-                                            }}
-                                        >
-                                            <DeleteIcon />
-                                        </IconButton>
+                                        <Box sx={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            width: isMobile ? 'auto' : 'auto',
+                                            minWidth: isMobile ? 80 : 120,
+                                        }}>
+                                            <Typography 
+                                                variant="h6"
+                                                sx={{ 
+                                                    fontWeight: 'bold',
+                                                    textAlign: 'right',
+                                                    fontSize: isMobile ? '1rem' : '1.25rem'
+                                                }}
+                                            >
+                                                {formatPrice(calculateSubtotal(item))}
+                                            </Typography>
+                                            <IconButton
+                                                size={isMobile ? "small" : "large"}
+                                                onClick={() => removeFromCart(item.product_id)}
+                                                sx={{ 
+                                                    '&:hover': {
+                                                        color: 'error.main',
+                                                    },
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize={isMobile ? "small" : "medium"} />
+                                            </IconButton>
+                                        </Box>
                                     </Box>
                                 </ListItem>
                             ))}
@@ -441,7 +497,13 @@ const Order: React.FC = () => {
                         borderTop: 1, 
                         borderBottom: 1,
                         borderColor: 'divider',
-                        bgcolor: 'background.paper'
+                        bgcolor: 'background.paper',
+                        position: isMobile ? 'fixed' : 'relative',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        width: isMobile ? '100%' : 'auto',
+                        zIndex: 1001
                     }}>
                         <Box sx={{ 
                             display: 'flex', 
