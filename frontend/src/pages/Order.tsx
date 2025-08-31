@@ -16,12 +16,17 @@ import {
     Alert,
     useMediaQuery,
     useTheme,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+    FormControl,
+    FormLabel,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { categoryService, productService, orderService } from '../services/api';
-import type { Category, Product, OrderItem } from '../types';
+import { categoryService, productService, orderService, paymentMethodService } from '../services/api';
+import type { Category, Product, OrderItem, PaymentMethod } from '../types';
 import Header from '../components/Header';
 import { useTranslation } from 'react-i18next';
 import { formatPrice } from '../utils/format';
@@ -34,12 +39,15 @@ const Order: React.FC = () => {
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
     const { t } = useTranslation();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         loadCategories();
+        loadPaymentMethods();
     }, []);
 
     useEffect(() => {
@@ -66,6 +74,18 @@ const Order: React.FC = () => {
             setProducts(data);
         } catch (error) {
             console.error('Error loading products:', error);
+        }
+    };
+
+    const loadPaymentMethods = async () => {
+        try {
+            const data = await paymentMethodService.getPaymentMethods();
+            setPaymentMethods(data);
+            if (data.length > 0) {
+                setSelectedPaymentMethod(data[0].payment_method_code);
+            }
+        } catch (error) {
+            console.error('Error loading payment methods:', error);
         }
     };
 
@@ -142,12 +162,16 @@ const Order: React.FC = () => {
 
     const handlePlaceOrder = async () => {
         if (cart.length === 0) return;
+        if (!selectedPaymentMethod) {
+            setError('Please select a payment method');
+            return;
+        }
 
         try {
             setIsPlacingOrder(true);
             setError(null);
             
-            const response = await orderService.createOrder(cart);
+            const response = await orderService.createOrder(cart, selectedPaymentMethod);
             
             // Clear cart after successful order
             setCart([]);
@@ -360,6 +384,32 @@ const Order: React.FC = () => {
                         <Typography variant="h6" gutterBottom>
                             {t('common.currentOrder')}
                         </Typography>
+                        
+                        {/* Payment Method Selection */}
+                        <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
+                            <FormLabel component="legend" sx={{ fontSize: '0.9rem', mb: 1 }}>
+                                {t('common.paymentMethod')}
+                            </FormLabel>
+                            <RadioGroup
+                                value={selectedPaymentMethod}
+                                onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                                sx={{ flexDirection: isMobile ? 'column' : 'row' }}
+                            >
+                                {paymentMethods.map((method) => (
+                                    <FormControlLabel
+                                        key={method.id}
+                                        value={method.payment_method_code}
+                                        control={<Radio size={isMobile ? "small" : "medium"} />}
+                                        label={method.name}
+                                        sx={{ 
+                                            fontSize: isMobile ? '0.8rem' : '0.875rem',
+                                            mr: isMobile ? 0 : 2
+                                        }}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+
                         <List>
                             {cart.map((item) => (
                                 <ListItem
@@ -518,7 +568,7 @@ const Order: React.FC = () => {
                         <Button
                             variant="contained"
                             fullWidth
-                            disabled={cart.length === 0 || isPlacingOrder}
+                            disabled={cart.length === 0 || isPlacingOrder || !selectedPaymentMethod}
                             size="large"
                             onClick={handlePlaceOrder}
                             sx={{ 

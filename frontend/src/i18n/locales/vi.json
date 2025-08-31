@@ -14,7 +14,8 @@
         "price": "Giá",
         "subtotal": "Thành tiền",
         "remove": "Xóa",
-        "add": "Thêm"
+        "add": "Thêm",
+        "paymentMethod": "Hình thức thanh toán"
     },
     "auth": {
         "login": "Đăng nhập",
@@ -29,9 +30,7 @@
         "totalRevenue": "Tổng doanh thu",
         "revenueByProduct": "Doanh thu theo sản phẩm",
         "revenueLast7Days": "Doanh thu 7 ngày gần nhất",
-        "revenueLast3Months": "Doanh thu 3 tháng gần nhất",
         "date": "Ngày",
-        "month": "Tháng",
         "revenue": "Doanh thu",
         "trend": "Xu hướng"
     },

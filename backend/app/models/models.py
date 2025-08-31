@@ -10,6 +10,23 @@ class UserRole(enum.Enum):
     SELLER = 1
     ADMIN = 2
 
+class PaymentMethod(Base):
+    __tablename__ = "payment_methods"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    payment_method_code = Column(String(20), nullable=False, unique=True, index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        Index('idx_payment_methods_payment_method_code', 'payment_method_code'),
+        Index('idx_payment_methods_is_active', 'is_active'),
+        Index('idx_payment_methods_name', 'name'),
+    )
+
 class User(Base):
     __tablename__ = "users"
     
@@ -39,13 +56,13 @@ class Category(Base):
     __tablename__ = "categories"
     
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), index=True)
-    description = Column(String(200))
-    image_url = Column(String(255))
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    image_url = Column(String(255), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     products = relationship("Product", back_populates="category", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -57,22 +74,22 @@ class Product(Base):
     __tablename__ = "products"
     
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), index=True)
-    description = Column(String(200))
-    price = Column(DECIMAL(10, 2), index=True)
-    image_url = Column(String(255))
-    category_id = Column(Integer, ForeignKey("categories.id"), index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    price = Column(DECIMAL(10, 2), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    image_url = Column(String(255), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     category = relationship("Category", back_populates="products")
     order_items = relationship("OrderItem", back_populates="product", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_products_is_active', 'is_active'),
-        Index('idx_products_category_id', 'category_id'),
         Index('idx_products_name', 'name'),
+        Index('idx_products_category_id', 'category_id'),
         Index('idx_products_price', 'price'),
     )
 
@@ -80,33 +97,36 @@ class Order(Base):
     __tablename__ = "orders"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    total_amount = Column(DECIMAL(10, 2))
-    status = Column(String(20), index=True)  # pending, completed, cancelled
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    total_amount = Column(DECIMAL(10, 2), nullable=False)
+    payment_method_code = Column(String(20), ForeignKey("payment_methods.payment_method_code"), nullable=True)
+    status = Column(String(50), nullable=False, default="pending")
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     user = relationship("User", back_populates="orders")
+    payment_method = relationship("PaymentMethod", foreign_keys=[payment_method_code])
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_orders_user_id', 'user_id'),
         Index('idx_orders_status', 'status'),
         Index('idx_orders_created_at', 'created_at'),
+        Index('idx_orders_payment_method_code', 'payment_method_code'),
     )
 
 class OrderItem(Base):
     __tablename__ = "order_items"
     
     id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("orders.id"), index=True)
-    product_id = Column(Integer, ForeignKey("products.id"), index=True)
+    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     product_name = Column(String(100), nullable=False)
     unit_price = Column(DECIMAL(10, 2), nullable=False)
-    quantity = Column(Integer)
-    price = Column(DECIMAL(10, 2))
+    quantity = Column(Integer, nullable=False)
+    price = Column(DECIMAL(10, 2), nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    
+
     order = relationship("Order", back_populates="items")
     product = relationship("Product", back_populates="order_items")
 

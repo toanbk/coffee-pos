@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Category, Product, Order, OrderItem } from '../types';
+import type { Category, Product, Order, OrderItem, PaymentMethod } from '../types';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
@@ -96,9 +96,19 @@ export const productService = {
     },
 };
 
+export const paymentMethodService = {
+    getPaymentMethods: async (): Promise<PaymentMethod[]> => {
+        const response = await api.get<PaymentMethod[]>('/payment-methods');
+        return response.data;
+    },
+};
+
 export const orderService = {
-    createOrder: async (items: OrderItem[]): Promise<{ order_id: number }> => {
-        const response = await api.post('/orders', { items });
+    createOrder: async (items: OrderItem[], paymentMethodCode?: string): Promise<{ order_id: number }> => {
+        const response = await api.post('/orders', { 
+            items,
+            payment_method_code: paymentMethodCode
+        });
         return response.data;
     },
     getOrders: async (): Promise<Order[]> => {

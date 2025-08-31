@@ -7,16 +7,24 @@ export interface User {
 export interface Category {
     id: number;
     name: string;
-    image_url: string;
+    description?: string;
+    image_url?: string;
 }
 
 export interface Product {
     id: number;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     category_id: number;
-    image_url: string;
+    image_url?: string;
+}
+
+export interface PaymentMethod {
+    id: number;
+    payment_method_code: string;
+    name: string;
+    description?: string;
 }
 
 export interface OrderItem {
@@ -28,9 +36,9 @@ export interface OrderItem {
 
 export interface Order {
     id: number;
-    user_id: number;
-    status: string;
     total_amount: number;
+    payment_method_code?: string;
+    status: string;
     created_at: string;
     items: OrderItem[];
 }

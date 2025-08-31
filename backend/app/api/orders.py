@@ -14,6 +14,7 @@ class OrderItemCreate(BaseModel):
 
 class OrderCreate(BaseModel):
     items: List[OrderItemCreate]
+    payment_method_code: str = None
 
 router = APIRouter()
 
@@ -45,6 +46,7 @@ async def create_order(
     order = Order(
         user_id=current_user.id,
         total_amount=total_amount,
+        payment_method_code=order_data.payment_method_code,
         status="pending"
     )
     db.add(order)
@@ -76,6 +78,7 @@ async def get_orders(
         {
             "id": order.id,
             "total_amount": order.total_amount,
+            "payment_method_code": order.payment_method_code,
             "status": order.status,
             "created_at": order.created_at,
             "items": [
@@ -109,6 +112,7 @@ async def get_order(
     return {
         "id": order.id,
         "total_amount": order.total_amount,
+        "payment_method_code": order.payment_method_code,
         "status": order.status,
         "created_at": order.created_at,
         "items": [
