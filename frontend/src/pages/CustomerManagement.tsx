@@ -37,7 +37,7 @@ import Header from '../components/Header';
 
 const CustomerManagement: React.FC = () => {
     const [customers, setCustomers] = useState<Customer[]>([]);
-    const [loading, setLoading] = useState(true);
+    // removed unused loading state
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
@@ -58,14 +58,11 @@ const CustomerManagement: React.FC = () => {
 
     const loadCustomers = async () => {
         try {
-            setLoading(true);
             const data = await customerService.getCustomers();
             setCustomers(data);
         } catch (error) {
             setError('Failed to load customers');
             console.error('Error loading customers:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -277,12 +274,12 @@ const CustomerManagement: React.FC = () => {
                             <FormControl fullWidth>
                                 <InputLabel>{t('customer.status')}</InputLabel>
                                 <Select
-                                    value={formData.is_active}
-                                    onChange={(e) => handleInputChange('is_active', e.target.value)}
+                                    value={formData.is_active ? 'true' : 'false'}
+                                    onChange={(e) => handleInputChange('is_active', e.target.value === 'true')}
                                     label={t('customer.status')}
                                 >
-                                    <MenuItem value={true}>{t('customer.active')}</MenuItem>
-                                    <MenuItem value={false}>{t('customer.inactive')}</MenuItem>
+                                    <MenuItem value={'true'}>{t('customer.active')}</MenuItem>
+                                    <MenuItem value={'false'}>{t('customer.inactive')}</MenuItem>
                                 </Select>
                             </FormControl>
                         </Box>

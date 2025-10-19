@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Category, Product, Order, OrderItem, PaymentMethod } from '../types';
+import type { Category, Product, Order, OrderItem, PaymentMethod, Customer } from '../types';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',

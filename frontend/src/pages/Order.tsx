@@ -22,9 +22,7 @@ import {
     FormControl,
     FormLabel,
     Autocomplete,
-    Select,
-    MenuItem,
-    InputLabel,
+    // removed unused: Select, MenuItem, InputLabel
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -415,7 +413,7 @@ const Order: React.FC = () => {
                                 </FormLabel>
                                 <Autocomplete
                                     value={customers.find(c => c.id === selectedCustomer) || null}
-                                    onChange={(event, newValue) => {
+                                    onChange={(_evt, newValue) => {
                                         setSelectedCustomer(newValue ? newValue.id : null);
                                     }}
                                     options={customers}
