@@ -127,7 +127,7 @@ class Order(Base):
 
     user = relationship("User", back_populates="orders")
     customer = relationship("Customer")
-    payment_method = relationship("PaymentMethod", foreign_keys=[payment_method_code])
+    payment_method = relationship("PaymentMethod", foreign_keys=[payment_method_code], primaryjoin="Order.payment_method_code == PaymentMethod.payment_method_code")
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     __table_args__ = (

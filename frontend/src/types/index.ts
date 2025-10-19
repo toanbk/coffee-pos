@@ -49,7 +49,9 @@ export interface Order {
     id: number;
     total_amount: number;
     payment_method_code?: string;
+    payment_method_name?: string;
     customer_id?: number;
+    customer_name?: string;
     status: string;
     created_at: string;
     items: OrderItem[];

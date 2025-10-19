@@ -62,6 +62,8 @@ const ViewOrder: React.FC = () => {
                 <Paper sx={{ border: '1px solid', borderColor: 'divider', boxShadow: 'none', p: { xs: 1.25, sm: 5 }, width: '100%', maxWidth: 1024, margin: 'auto' }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>{t('Order #')}: #{order.id}</Typography>
                     <Typography sx={{ mb: 1 }}>{t('Date')}: {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: vi })}</Typography>
+                    <Typography sx={{ mb: 1 }}>{t('common.customer')}: {order.customer_name || t('common.noCustomer')}</Typography>
+                    <Typography sx={{ mb: 1 }}>{t('common.paymentMethod')}: {order.payment_method_name || '-'}</Typography>
                     <TableContainer>
                         <Table>
                             <TableHead>

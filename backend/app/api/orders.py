@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 from ..config.database import get_db
-from ..models.models import Order, OrderItem, Product, User
+from ..models.models import Order, OrderItem, Product, User, Customer, PaymentMethod
 from ..utils.auth import get_current_user
 from pydantic import BaseModel
 from datetime import datetime, timedelta
@@ -75,13 +75,18 @@ async def get_orders(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    orders = db.query(Order).filter(Order.user_id == current_user.id).all()
+    orders = db.query(Order).options(
+        joinedload(Order.customer),
+        joinedload(Order.payment_method)
+    ).all()
     return [
         {
             "id": order.id,
             "total_amount": order.total_amount,
             "payment_method_code": order.payment_method_code,
+            "payment_method_name": order.payment_method.name if order.payment_method else None,
             "customer_id": order.customer_id,
+            "customer_name": order.customer.customer_name if order.customer else None,
             "status": order.status,
             "created_at": order.created_at,
             "items": [
@@ -104,9 +109,11 @@ async def get_order(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    order = db.query(Order).filter(
-        Order.id == order_id,
-        Order.user_id == current_user.id
+    order = db.query(Order).options(
+        joinedload(Order.customer),
+        joinedload(Order.payment_method)
+    ).filter(
+        Order.id == order_id
     ).first()
     
     if not order:
@@ -116,7 +123,9 @@ async def get_order(
         "id": order.id,
         "total_amount": order.total_amount,
         "payment_method_code": order.payment_method_code,
+        "payment_method_name": order.payment_method.name if order.payment_method else None,
         "customer_id": order.customer_id,
+        "customer_name": order.customer.customer_name if order.customer else None,
         "status": order.status,
         "created_at": order.created_at,
         "items": [
@@ -177,21 +186,56 @@ def get_order_history(
     else:
         raise HTTPException(status_code=400, detail="Invalid date filter")
 
-    orders = db.query(Order).filter(
+    orders = db.query(Order, Customer, PaymentMethod).outerjoin(
+        Customer, Order.customer_id == Customer.id
+    ).outerjoin(
+        PaymentMethod, Order.payment_method_code == PaymentMethod.payment_method_code
+    ).filter(
         Order.created_at >= start_date,
         Order.created_at < end_date
     ).order_by(Order.created_at.desc()).all()
 
     result = []
-    for order in orders:
+    for order_tuple in orders:
+        order, customer, payment_method = order_tuple
         total_quantity = sum(item.quantity for item in order.items)
+        
         result.append({
             "id": order.id,
             "order_date": order.created_at,
             "total_quantity": total_quantity,
             "total_amount": float(order.total_amount),
+            "customer_name": customer.customer_name if customer else None,
+            "payment_method_name": payment_method.name if payment_method else None,
         })
     return result
+
+@router.get("/debug/{order_id}")
+def debug_order(order_id: int, db: Session = Depends(get_db)):
+    """Debug endpoint to check order data and relationships"""
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Check raw data
+    customer = db.query(Customer).filter(Customer.id == order.customer_id).first() if order.customer_id else None
+    payment_method = db.query(PaymentMethod).filter(PaymentMethod.payment_method_code == order.payment_method_code).first() if order.payment_method_code else None
+    
+    return {
+        "order_id": order.id,
+        "customer_id": order.customer_id,
+        "payment_method_code": order.payment_method_code,
+        "customer_data": {
+            "id": customer.id if customer else None,
+            "name": customer.customer_name if customer else None
+        } if customer else None,
+        "payment_method_data": {
+            "code": payment_method.payment_method_code if payment_method else None,
+            "name": payment_method.name if payment_method else None
+        } if payment_method else None,
+        "relationship_customer": order.customer.customer_name if order.customer else None,
+        "relationship_payment_method": order.payment_method.name if order.payment_method else None
+    }
 
 @router.delete("/delete/{order_id}")
 def delete_order(order_id: int, db: Session = Depends(get_db)):

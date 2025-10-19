@@ -27,6 +27,8 @@ interface Order {
     order_date: string;
     total_quantity: number;
     total_amount: number;
+    customer_name?: string;
+    payment_method_name?: string;
 }
 
 const OrderHistory: React.FC = () => {
@@ -102,6 +104,8 @@ const OrderHistory: React.FC = () => {
                                     <TableRow>
                                         <TableCell>{t('Order #')}</TableCell>
                                         <TableCell>{t('Date')}</TableCell>
+                                        <TableCell>{t('common.customer')}</TableCell>
+                                        <TableCell>{t('common.paymentMethod')}</TableCell>
                                         <TableCell>{t('Qty')}</TableCell>
                                         <TableCell>{t('Total')}</TableCell>
                                         <TableCell>{t('Action')}</TableCell>
@@ -112,6 +116,8 @@ const OrderHistory: React.FC = () => {
                                         <TableRow key={order.id}>
                                             <TableCell>#{order.id}</TableCell>
                                             <TableCell>{format(new Date(order.order_date), 'dd/MM/yyyy HH:mm', { locale: vi })}</TableCell>
+                                            <TableCell>{order.customer_name || t('common.noCustomer')}</TableCell>
+                                            <TableCell>{order.payment_method_name || '-'}</TableCell>
                                             <TableCell>{order.total_quantity}</TableCell>
                                             <TableCell>{formatPrice(order.total_amount)}</TableCell>
                                             <TableCell>
