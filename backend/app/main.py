@@ -12,10 +12,16 @@ app = FastAPI(title="Coffee POS API")
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend URL
+    allow_origins=[
+        "http://localhost:5173",  # Development frontend
+        "http://pos.huongbonmua.com",  # Production frontend (HTTP)
+        "https://pos.huongbonmua.com",  # Production frontend (HTTPS)
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["Content-Length", "Content-Range"],
+    max_age=1728000,  # 20 days
 )
 
 # Include routers
