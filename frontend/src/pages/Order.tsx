@@ -21,12 +21,16 @@ import {
     FormControlLabel,
     FormControl,
     FormLabel,
+    Autocomplete,
+    Select,
+    MenuItem,
+    InputLabel,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { categoryService, productService, orderService, paymentMethodService } from '../services/api';
-import type { Category, Product, OrderItem, PaymentMethod } from '../types';
+import { categoryService, productService, orderService, paymentMethodService, customerService } from '../services/api';
+import type { Category, Product, OrderItem, PaymentMethod, Customer } from '../types';
 import Header from '../components/Header';
 import { useTranslation } from 'react-i18next';
 import { formatPrice } from '../utils/format';
@@ -41,6 +45,8 @@ const Order: React.FC = () => {
     const [success, setSuccess] = useState<string | null>(null);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
     const { t } = useTranslation();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -48,6 +54,7 @@ const Order: React.FC = () => {
     useEffect(() => {
         loadCategories();
         loadPaymentMethods();
+        loadCustomers();
     }, []);
 
     useEffect(() => {
@@ -86,6 +93,15 @@ const Order: React.FC = () => {
             }
         } catch (error) {
             console.error('Error loading payment methods:', error);
+        }
+    };
+
+    const loadCustomers = async () => {
+        try {
+            const data = await customerService.getActiveCustomers();
+            setCustomers(data);
+        } catch (error) {
+            console.error('Error loading customers:', error);
         }
     };
 
@@ -171,7 +187,7 @@ const Order: React.FC = () => {
             setIsPlacingOrder(true);
             setError(null);
             
-            const response = await orderService.createOrder(cart, selectedPaymentMethod);
+            const response = await orderService.createOrder(cart, selectedPaymentMethod, selectedCustomer || undefined);
             
             // Clear cart after successful order
             setCart([]);
@@ -385,30 +401,92 @@ const Order: React.FC = () => {
                             {t('common.currentOrder')}
                         </Typography>
                         
-                        {/* Payment Method Selection */}
-                        <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
-                            <FormLabel component="legend" sx={{ fontSize: '0.9rem', mb: 1 }}>
-                                {t('common.paymentMethod')}
-                            </FormLabel>
-                            <RadioGroup
-                                value={selectedPaymentMethod}
-                                onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                                sx={{ flexDirection: isMobile ? 'column' : 'row' }}
-                            >
-                                {paymentMethods.map((method) => (
-                                    <FormControlLabel
-                                        key={method.id}
-                                        value={method.payment_method_code}
-                                        control={<Radio size={isMobile ? "small" : "medium"} />}
-                                        label={method.name}
-                                        sx={{ 
-                                            fontSize: isMobile ? '0.8rem' : '0.875rem',
-                                            mr: isMobile ? 0 : 2
-                                        }}
-                                    />
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
+                        {/* Customer and Payment Method Selection */}
+                        <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: isMobile ? 'column' : 'row', 
+                            gap: 2, 
+                            mb: 2 
+                        }}>
+                            {/* Customer Selection */}
+                            <FormControl sx={{ flex: 1 }}>
+                                <FormLabel component="legend" sx={{ fontSize: '0.9rem', mb: 1 }}>
+                                    {t('common.customer')}
+                                </FormLabel>
+                                <Autocomplete
+                                    value={customers.find(c => c.id === selectedCustomer) || null}
+                                    onChange={(event, newValue) => {
+                                        setSelectedCustomer(newValue ? newValue.id : null);
+                                    }}
+                                    options={customers}
+                                    getOptionLabel={(option) => option.customer_name}
+                                    filterOptions={(options, { inputValue }) => {
+                                        // Function to remove Vietnamese diacritics
+                                        const removeDiacritics = (str: string) => {
+                                            return str
+                                                .normalize('NFD')
+                                                .replace(/[\u0300-\u036f]/g, '')
+                                                .replace(/đ/g, 'd')
+                                                .replace(/Đ/g, 'D');
+                                        };
+
+                                        const normalizedInput = removeDiacritics(inputValue.toLowerCase());
+                                        
+                                        return options.filter(option => {
+                                            const normalizedName = removeDiacritics(option.customer_name.toLowerCase());
+                                            const phoneMatch = option.phone && option.phone.includes(inputValue);
+                                            
+                                            return normalizedName.includes(normalizedInput) || phoneMatch;
+                                        });
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder={t('common.selectCustomer')}
+                                            size={isMobile ? "small" : "medium"}
+                                        />
+                                    )}
+                                    renderOption={(props, option) => (
+                                        <Box component="li" {...props}>
+                                            <Box>
+                                                <Typography variant="body2">
+                                                    {option.customer_name}
+                                                </Typography>
+                                                {option.phone && (
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {option.phone}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    )}
+                                    noOptionsText={t('common.noCustomer')}
+                                    clearOnEscape
+                                    clearText={t('common.noCustomer')}
+                                />
+                            </FormControl>
+
+                            {/* Payment Method Selection */}
+                            <FormControl sx={{ flex: 1 }}>
+                                <FormLabel component="legend" sx={{ fontSize: '0.9rem', mb: 1 }}>
+                                    {t('common.paymentMethod')}
+                                </FormLabel>
+                                <RadioGroup
+                                    value={selectedPaymentMethod}
+                                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                                >
+                                    {paymentMethods.map((method) => (
+                                        <FormControlLabel
+                                            key={method.id}
+                                            value={method.payment_method_code}
+                                            control={<Radio size={isMobile ? "small" : "medium"} />}
+                                            label={method.name}
+                                            sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            </FormControl>
+                        </Box>
 
                         <List>
                             {cart.map((item) => (

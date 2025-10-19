@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Order from './pages/Order';
 import Report from './pages/Report';
 import Home from './pages/Home';
+import CustomerManagement from './pages/CustomerManagement';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './i18n'; // Import i18n configuration
@@ -23,6 +24,7 @@ function App() {
                         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                         <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
                         <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+                        <Route path="/customers" element={<ProtectedRoute><CustomerManagement /></ProtectedRoute>} />
                         <Route path="/order/history" element={<OrderHistory />} />
                         <Route path="/order/view/:orderId" element={<ViewOrder />} />
                         <Route path="*" element={<Navigate to="/" replace />} />

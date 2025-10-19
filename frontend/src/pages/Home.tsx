@@ -5,6 +5,7 @@ import { Box, Button, Container, Typography, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import PeopleIcon from '@mui/icons-material/People';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HistoryIcon from '@mui/icons-material/History';
 import { useTranslation } from 'react-i18next';
@@ -81,17 +82,26 @@ const Home: React.FC = () => {
                     >
                         {t('Order History')}
                     </StyledButton>
-                    {isAdmin && (
-                        <StyledButton
-                            variant="contained"
-                            color="secondary"
-                            startIcon={<AssessmentIcon />}
-                            onClick={() => navigate('/report')}
-                            fullWidth
-                        >
-                            {t('common.report')}
-                        </StyledButton>
-                    )}
+                           {isAdmin && (
+                               <StyledButton
+                                   variant="contained"
+                                   color="secondary"
+                                   startIcon={<AssessmentIcon />}
+                                   onClick={() => navigate('/report')}
+                                   fullWidth
+                               >
+                                   {t('common.report')}
+                               </StyledButton>
+                           )}
+                           <StyledButton
+                               variant="contained"
+                               color="info"
+                               startIcon={<PeopleIcon />}
+                               onClick={() => navigate('/customers')}
+                               fullWidth
+                           >
+                               {t('customer.customerManagement')}
+                           </StyledButton>
                     <StyledButton
                         variant="outlined"
                         color="error"

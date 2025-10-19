@@ -27,6 +27,17 @@ export interface PaymentMethod {
     description?: string;
 }
 
+export interface Customer {
+    id: number;
+    customer_name: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    sort_order: number;
+    is_active: boolean;
+    created_at?: string;
+}
+
 export interface OrderItem {
     product_id: number;
     product_name: string;
@@ -38,6 +49,7 @@ export interface Order {
     id: number;
     total_amount: number;
     payment_method_code?: string;
+    customer_id?: number;
     status: string;
     created_at: string;
     items: OrderItem[];

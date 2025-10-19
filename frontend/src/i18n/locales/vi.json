@@ -15,7 +15,10 @@
         "subtotal": "Thành tiền",
         "remove": "Xóa",
         "add": "Thêm",
-        "paymentMethod": "Hình thức thanh toán"
+        "paymentMethod": "Hình thức thanh toán",
+        "customer": "Khách hàng",
+        "selectCustomer": "Chọn khách hàng",
+        "noCustomer": "Không có khách hàng"
     },
     "auth": {
         "login": "Đăng nhập",
@@ -33,6 +36,28 @@
         "date": "Ngày",
         "revenue": "Doanh thu",
         "trend": "Xu hướng"
+    },
+    "customer": {
+        "customerManagement": "Quản lý khách hàng",
+        "addCustomer": "Thêm khách hàng",
+        "editCustomer": "Sửa khách hàng",
+        "customerName": "Tên khách hàng",
+        "phone": "Số điện thoại",
+        "address": "Địa chỉ",
+        "city": "Thành phố",
+        "status": "Trạng thái",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "actions": "Hành động",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "activate": "Kích hoạt",
+        "deactivate": "Vô hiệu hóa",
+        "customerAdded": "Thêm khách hàng thành công",
+        "customerUpdated": "Cập nhật khách hàng thành công",
+        "customerDeleted": "Vô hiệu hóa khách hàng thành công",
+        "customerActivated": "Kích hoạt khách hàng thành công"
     },
     "Order History": "Lịch sử đơn hàng",
     "Order #": "Mã đơn",

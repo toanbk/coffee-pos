@@ -103,11 +103,36 @@ export const paymentMethodService = {
     },
 };
 
+export const customerService = {
+    getCustomers: async (): Promise<Customer[]> => {
+        const response = await api.get<Customer[]>('/customers');
+        return response.data;
+    },
+    getActiveCustomers: async (): Promise<Customer[]> => {
+        const response = await api.get<Customer[]>('/customers/active');
+        return response.data;
+    },
+    createCustomer: async (customerData: Omit<Customer, 'id' | 'created_at'>): Promise<{ id: number }> => {
+        const response = await api.post('/customers', customerData);
+        return response.data;
+    },
+    updateCustomer: async (id: number, customerData: Partial<Customer>): Promise<void> => {
+        await api.put(`/customers/${id}`, customerData);
+    },
+    deleteCustomer: async (id: number): Promise<void> => {
+        await api.delete(`/customers/${id}`);
+    },
+    activateCustomer: async (id: number): Promise<void> => {
+        await api.put(`/customers/${id}/activate`);
+    },
+};
+
 export const orderService = {
-    createOrder: async (items: OrderItem[], paymentMethodCode?: string): Promise<{ order_id: number }> => {
+    createOrder: async (items: OrderItem[], paymentMethodCode?: string, customerId?: number): Promise<{ order_id: number }> => {
         const response = await api.post('/orders', { 
             items,
-            payment_method_code: paymentMethodCode
+            payment_method_code: paymentMethodCode,
+            customer_id: customerId
         });
         return response.data;
     },

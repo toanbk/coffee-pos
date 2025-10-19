@@ -15,7 +15,10 @@
         "subtotal": "Subtotal",
         "remove": "Remove",
         "add": "Add",
-        "paymentMethod": "Payment Method"
+        "paymentMethod": "Payment Method",
+        "customer": "Customer",
+        "selectCustomer": "Select Customer",
+        "noCustomer": "No Customer"
     },
     "auth": {
         "login": "Login",
@@ -33,5 +36,27 @@
         "date": "Date",
         "revenue": "Revenue",
         "trend": "Trend"
+    },
+    "customer": {
+        "customerManagement": "Customer Management",
+        "addCustomer": "Add Customer",
+        "editCustomer": "Edit Customer",
+        "customerName": "Customer Name",
+        "phone": "Phone",
+        "address": "Address",
+        "city": "City",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "actions": "Actions",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "customerAdded": "Customer added successfully",
+        "customerUpdated": "Customer updated successfully",
+        "customerDeleted": "Customer deactivated successfully",
+        "customerActivated": "Customer activated successfully"
     }
 } 

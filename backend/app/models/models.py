@@ -27,6 +27,26 @@ class PaymentMethod(Base):
         Index('idx_payment_methods_name', 'name'),
     )
 
+class Customer(Base):
+    __tablename__ = "customers"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    customer_name = Column(String(100), nullable=False)
+    phone = Column(String(20), nullable=True)
+    address = Column(String(255), nullable=True)
+    city = Column(String(100), nullable=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        Index('idx_customers_customer_name', 'customer_name'),
+        Index('idx_customers_phone', 'phone'),
+        Index('idx_customers_is_active', 'is_active'),
+        Index('idx_customers_sort_order', 'sort_order'),
+    )
+
 class User(Base):
     __tablename__ = "users"
     
@@ -98,6 +118,7 @@ class Order(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
     total_amount = Column(DECIMAL(10, 2), nullable=False)
     payment_method_code = Column(String(20), ForeignKey("payment_methods.payment_method_code"), nullable=True)
     status = Column(String(50), nullable=False, default="pending")
@@ -105,11 +126,13 @@ class Order(Base):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="orders")
+    customer = relationship("Customer")
     payment_method = relationship("PaymentMethod", foreign_keys=[payment_method_code])
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_orders_user_id', 'user_id'),
+        Index('idx_orders_customer_id', 'customer_id'),
         Index('idx_orders_status', 'status'),
         Index('idx_orders_created_at', 'created_at'),
         Index('idx_orders_payment_method_code', 'payment_method_code'),
